@@ -73,6 +73,16 @@ function displayDeck(deck) {
     }
     CARDOUTPUT.innerHTML = deckList;
 }
+function displayDeckTable(deck) {
+    console.log("displayDeck function called.");
+    console.log(deck);
+    var deckList = "";
+    for (var x = 0; x < deck.length; x++) {
+        deckList += deck[x] + " ";
+        console.log("Card: " + deckList);
+    }
+    TABLE.innerHTML = deckList;
+}
 function shuffle(array) {
     console.log("shuffle function called.");
     var currentIndex = array.length, temporaryValue, randomIndex;
@@ -98,5 +108,7 @@ function shuffle(array) {
 deck = buildDeck();
 displayDeck(deck);
 deck = shuffle(deck);
+displayDeckTable(deck);
+
 
 
