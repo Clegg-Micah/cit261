@@ -1,62 +1,80 @@
-//Canvas stuff
-var GAME = document.getElementById("game");
-var ctx = GAME.getContext("2d");
 //Selecting Elements
 var CARDOUTPUT = document.getElementById("jsoutput");
+var TABLE = document.getElementById("table");
 //logic
-var deck = buildDeck(52);
+var deck;
 //var cardOutput = document.createElement("div");
 var alertMessage = "Javascript Loaded!";
 var suits = ["Spades", "Hearts", "Clubs", "Diamonds"];
+var perSuit = 13;
 
 //Constructor
-alert(alertMessage);
-function Card(value, suit, type = "Number") {
-
+function Card(value, suit, type) {
+    console.log("Card function called.");
     //TODO make type catcher setting default did not work.
     this.value = value;
     this.suit = suit;
+    if(typeof(type) === undefined) {
+        this.type = "Number";
+    }
     this.type = type;
 }
-alert(alertMessage);
-function buildDeck(length, suitList=["Spades", "Hearts", "Clubs", "Diamonds"], perSuit=13) {
+function buildDeck() {
     var cards = [];
-    for (var x=0; x<suitList.length; x++) {
-        for( y=0; y<perSuit y++) {
-            if(y!=0 && y<10) {
-                cards[x*y+y] = new Card(y+1, suitList[x]);
-            } else {
-                switch(y) {
-                    case 0:
-                        cards[x*y+y] = new Card(y+1, suitList[x], "Ace")
-                        break;
-                    case 10:
-                        cards[x*y+y] = new Card(y+1, suitList[x], "Jack")
-                        break;
-                    case 11:
-                        cards[x*y+y] = new Card(y+1, suitList[x], "Queen")
-                        break;
-                    case 12:
-                        cards[x*y+y] = new Card(y+1, suitList[x], "King")
-                        break;
-                }
-            }
+    var card = 1;
+    for(var x = 0; x<suits.length; x++) {
+        for (var y=0; y<perSuit; y++) {
+            cards.push(card);
+            card++;
         }
-        console.log(cards);
     }
     return cards;
 }
-alert(alertMessage);
+//function buildDeck() {
+//    console.log("buildDeck function called.");
+//    var cards = [];
+//    var card = 0;
+//    for (var x=0; x<suits.length; x++) {
+//        console.log("x loop", x);
+//        console.log(suits.length);
+//        for (var y=0; y<perSuit; y++) {
+//            console.log("y loop", y);
+//            cards.push(new Card(y, suits[x], "number"));
+//
+//            console.log(cards[card]);
+//                switch(y) {
+//                    case 0:
+//                        cards[card].type = "Ace";
+//                        break;
+//                    case 10:
+//                        cards[card].type = "Jack";
+//                        break;
+//                    case 11:
+//                        cards[card].type = "Queen";
+//                        break;
+//                    case 12:
+//                        cards[card].type = "King";
+//                        break;
+//            }
+//            card++;
+//            console.log(cards);
+//        }
+//        console.log(cards);
+//        return cards;
+//    }
+//}
 function displayDeck(deck) {
+    console.log("displayDeck function called.");
+    console.log(deck);
     var deckList = "";
-    var x=0;
-    for (x in deck) {
+    for (var x = 0; x < deck.length; x++) {
         deckList += deck[x] + " ";
+        console.log("Card: " + deckList);
     }
     CARDOUTPUT.innerHTML = deckList;
 }
-alert(alertMessage);
 function shuffle(array) {
+    console.log("shuffle function called.");
     var currentIndex = array.length, temporaryValue, randomIndex;
 
     //while there are elements to shuffle...
@@ -73,13 +91,12 @@ function shuffle(array) {
     }
     return array;
 }
-function createCards(deck) {
-    var x = 0;
-    for (x in deck) {
-        if
-    }
-}
+/*
+    TODO Create a function which displays the deck as a set of cards stored in divs.
+*/
     alert(alertMessage);
+deck = buildDeck();
 displayDeck(deck);
 deck = shuffle(deck);
+
 
