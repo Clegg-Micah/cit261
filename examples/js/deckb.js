@@ -15,7 +15,7 @@ function Card(value, suit) {
     //TODO make type catcher setting default did not work.
     this.value = value;
     this.suit = suit;
-    if(value == 1) {
+    if (value === 1) {
         this.type = "Ace";
     } else if (value < 11) {
         this.type = "Number";
@@ -35,6 +35,12 @@ function Card(value, suit) {
                 console.warn("Invalid Card Value: " + value);
         }
     }
+    if(suit == "Hearts" || suit == "Diamonds") {
+        this.color = "Red";
+    }
+    else {
+        this.color = "Black";
+    }
 }
 function buildDeck() {
     var cards = [];
@@ -46,41 +52,6 @@ function buildDeck() {
     }
     return cards;
 }
-/*
-function buildDeck() {
-    console.log("buildDeck function called.");
-    var cards = [];
-    var card = 0;
-    for (var x=0; x<suits.length; x++) {
-        console.log("x loop", x);
-        console.log(suits.length);
-        for (var y=0; y<perSuit; y++) {
-            console.log("y loop", y);
-            cards.push(new Card(y, suits[x], "number"));
-
-            console.log(cards[card]);
-                switch(y) {
-                    case 0:
-                        cards[card].type = "Ace";
-                        break;
-                    case 10:
-                        cards[card].type = "Jack";
-                        break;
-                    case 11:
-                        cards[card].type = "Queen";
-                        break;
-                    case 12:
-                        cards[card].type = "King";
-                        break;
-            }
-            card++;
-            console.log(cards);
-        }
-        console.log(cards);
-        return cards;
-    }
-}
-*/
 function displayDeck(deck, destination) {
     console.log("displayDeck function called.");
     console.log(deck);
@@ -91,8 +62,8 @@ function displayDeck(deck, destination) {
     console.log(deckList);
     destination.innerHTML = deckList;
 }
-function displayCard(card) {
-    var text = "";
+function displayCardText(card) {
+    var text = '';
     var x;
     if( card.type.toLowerCase() == "number") {
         text += card.value + " of " + card.suit;
@@ -101,6 +72,21 @@ function displayCard(card) {
     }
     text += ", ";
     return text;
+}
+function displayCard(card) {
+    var cardface = '<div class="card ';
+    cardface += ' ' + card.suit.toLowerCase() ;
+    cardface += ' ' + card.color.toLowerCase() + '-card';
+    cardface += '">';
+    if( card.type.toLowerCase() == "number") {
+        cardface += card.value;
+    } else {
+        cardface += card.type;
+    }
+    cardface += " of " + card.suit;
+    cardface += "</div> ";
+    console.log(cardface);
+    return cardface;
 }
 function shuffle(array) {
     console.log("shuffle function called.");
@@ -115,7 +101,7 @@ function shuffle(array) {
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex -= 1;
 
-        // Swap itwith the current element.
+        // Swap it with the current element.
         temporaryValue = newArray[currentIndex];
         newArray[currentIndex] = newArray[randomIndex];
         newArray[randomIndex] = temporaryValue;
@@ -126,7 +112,7 @@ function shuffle(array) {
 /*
     TODO Create a function which displays the deck as a set of cards stored in divs.
 */
-    alert(alertMessage);
+alert(alertMessage);
 deck = buildDeck();
 displayDeck(deck, CARDOUTPUT);
 deck_shuffled = shuffle(deck);
