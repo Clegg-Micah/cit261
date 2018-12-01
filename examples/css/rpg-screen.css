@@ -16,6 +16,7 @@ main {
 }
 main>div {
     height: auto;
+    border: 5px solid green;
     text-align: center;
     padding: 1em;
 }
