@@ -63,7 +63,8 @@ charCreate.addEventListener("click", function(event) {
     //collect data from form
     var charData = [document.getElementById("create-name").value, document.getElementById("create-class").value];
     console.log(charData);
-    var text = 'Character Information: Name: ' + charName + " Class: " + charClass;
+    //TODO convert charData into an Object
+    var text = 'Character Information: Name: ' + charData[0] + " Class: " + charData[1];
     document.getElementById("results").innerHTML = text;
     document.getElementById("results").classList.toggle("hide");
     //TODO display stats to the side (Diablo Style)
