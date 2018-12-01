@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title id="title">Micah Clegg | CIT 261</title>
+    <meta name="author" content="Micah Clegg">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" type="text/css" href="css/normalize.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="css/rpg-screen.css" media="screen">
+</head>
+
+<body>
+    <div id="wrapper">
+        <header id="page Header">
+            <h1>The Tomb of Mardok</h1>
+        </header>
+        <nav id="page-nav">
+
+        </nav>
+        <main>
+           <div id="menu-main" class="hide">
+               <span>A role-playing game by Micah Clegg</span>
+               <ul>
+                   <li><button id="menu-new-game" class="menu-botton">New Game</button></li>
+                   <li><button id="menu-load-game" class="menu-botton">Load Game</button></li>
+                   <li><button id="menu-option" class="menu-botton">Options</button></li>
+                   <li><button id="menu-credits" class="menu-botton">Credits</button></li>
+               </ul>
+           </div>
+           <div id="char-creation" class="">
+               <form name="char-create" id="create-form">
+                   Enter your character's name:
+                   <input name="charname" type="text" id="create-name">
+                   <p>Select your class:
+                      <select id="create-class">
+                          <option value="Warrior">Warrior</option>
+                          <option value="Ranger">Ranger</option>
+                      </select>
+                   </p>
+                   <input type="button" value="Create Character!" id="create-character">
+               </form>
+               <div id="results" class="hide">Results will display here!</div>
+           </div>
+            <div class="grid-wrapper hide" id="game-display">
+                <div id="stats">
+                    <h1 id="p-name">Player</h1>
+                    <h2>Stats</h2>
+                    <ul>
+                        <li>HP: <span id="p-hp" class="player-stat">XX</span></li>
+                        <li>MP: <span id="p-mp" class="player-stat">XX</span></li>
+                    </ul>
+                    <h2>Equipment</h2>
+                    <ul>
+                        <li>Weapon: <span id="p-weapon" class="player-info">None</span></li>
+                        <li>Armor: <span id="p-armor" class="player-info">None</span></li>
+                    </ul>
+                </div>
+                <nav id="menu">
+                    <h2>Navigation</h2>
+                    <ul>
+                        <li><button id="new-adventure" class="ingame-button">Adventure</button></li>
+                        <li><button id="to=town"  class="ingame-button">Town</button></li>
+                        <li><button id="save-game"  class="ingame-button">Save</button></li>
+                    </ul>
+                </nav>
+                <div id="display">DISPLAY</div>
+                <div id="actions">ACTIONS</div>
+                <div id="console">Console</div>
+            </div>
+        </main>
+        <footer>
+            <p><small>2018 &copy; Micah Clegg, All rights reserved.</small></p>
+        </footer>
+        <script type="text/javascript" src="js/rpg.js"></script>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,59 @@
+{
+    "monsters": [
+        {
+            "name":"Goblin",
+            "maxHP":5,
+            "attack": 1,
+            "armor":0,
+            "gold":1
+        },
+        {
+            "name":"Kobold",
+            "maxHP": 10,
+            "attack": 2,
+            "armor":1,
+            "gold":2
+        },
+        {
+            "name":"Bandit",
+            "maxHP": 15,
+            "attack": 3,
+            "armor":4,
+            "gold":3
+        }
+    ],
+    "weapons": [
+        {
+            "name":"None",
+            "attack":0,
+            "cost":0
+        },
+        {
+            "name":"Big Stick",
+            "attack":1,
+            "cost":10
+        },
+        {
+            "name":"Copper Sword",
+            "attack":2,
+            "cost":25
+        }
+    ],
+    "armor": [
+        {
+            "name":"Plain Clothes",
+            "armor":0,
+            "cost":0
+        },
+        {
+            "name":"Leather Armor",
+            "armor":1,
+            "cost":15
+        },
+        {
+            "name":"Chainmail",
+            "armor":3,
+            "cost":50
+        }
+    ]
+}
