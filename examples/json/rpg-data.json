@@ -1,59 +1,89 @@
 {
     "monsters": [
         {
-            "name":"Goblin",
-            "maxHP":5,
+            "name": "Goblin",
+            "maxHP": 5,
             "attack": 1,
-            "armor":0,
-            "gold":1
+            "armor": 0,
+            "gold": 1
         },
         {
-            "name":"Kobold",
+            "name": "Kobold",
             "maxHP": 10,
             "attack": 2,
-            "armor":1,
-            "gold":2
+            "armor": 1,
+            "gold": 2
         },
         {
-            "name":"Bandit",
+            "name": "Bandit",
             "maxHP": 15,
             "attack": 3,
-            "armor":4,
-            "gold":3
+            "armor": 4,
+            "gold": 3
         }
     ],
     "weapons": [
         {
-            "name":"None",
-            "attack":0,
-            "cost":0
+            "name": "None",
+            "attack": 0,
+            "cost": 0
         },
         {
-            "name":"Big Stick",
-            "attack":1,
-            "cost":10
+            "name": "Big Stick",
+            "attack": 1,
+            "cost": 10
         },
         {
-            "name":"Copper Sword",
-            "attack":2,
-            "cost":25
+            "name": "Copper Sword",
+            "attack": 2,
+            "cost": 25
         }
     ],
     "armor": [
         {
-            "name":"Plain Clothes",
-            "armor":0,
-            "cost":0
+            "name": "Plain Clothes",
+            "armor": 0,
+            "cost": 0
         },
         {
-            "name":"Leather Armor",
-            "armor":1,
-            "cost":15
+            "name": "Leather Armor",
+            "armor": 1,
+            "cost": 15
         },
         {
-            "name":"Chainmail",
-            "armor":3,
-            "cost":50
+            "name": "Chainmail",
+            "armor": 3,
+            "cost": 50
+        }
+    ],
+    "starting-stats": [
+        {
+            "name": "Warrior",
+            "strength": 7,
+            "agility": 5,
+            "endurance": 7,
+            "pow": 3
+        },
+        {
+            "name": "Ranger",
+            "strength": 5,
+            "agility": 7,
+            "endurance": 5,
+            "pow": 5
+        },
+        {
+            "name": "Cleric",
+            "strength": 5,
+            "agility": 3,
+            "endurance": 5,
+            "pow": 9
+        },
+        {
+            "name": "Paladin",
+            "strength": 7,
+            "agility": 3,
+            "endurance": 5,
+            "pow": 7
         }
     ]
 }
