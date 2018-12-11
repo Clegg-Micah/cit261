@@ -19,7 +19,7 @@
 
         </nav>
         <main>
-           <div id="menu-main" class="">
+           <div id="menu-main">
                <span>A role-playing game by Micah Clegg</span>
                <ul id="menu-main-list">
                    <li><button id="menu-new-game" class="menu-botton">New Game</button></li>
@@ -28,32 +28,36 @@
                    <li><button id="menu-credits" class="menu-botton">Credits</button></li>
                </ul>
            </div>
-           <div id="char-creation" class="">
+           <div id="char-creation" class="hide">
                <form name="char-create" id="create-form" method="post">
                    Enter your character's name:
                    <input name="charname" type="text" id="create-name" class="create-char-data">
+<!--
                    <p>Select your profession:
                       <select id="create-profession" class="create-char-data">
                           <option value="Warrior">Warrior</option>
                           <option value="Ranger">Ranger</option>
                       </select>
                    </p>
+-->
                    <input type="button" value="Create Character!" id="create-character">
                </form>
                <div id="results" class="hide">Results will display here!</div>
            </div>
-            <div class="grid-wrapper" id="game-display">
+            <div class="grid-wrapper hide" id="game-display">
                 <div id="stats">
                     <h1 id="p-name">Player</h1>
-                    <h2>Stats</h2>
                     <ul id="player-info">
-                        <li>HP: <span id="p-hp" class="player-stat">XX</span></li>
-                        <li>MP: <span id="p-mp" class="player-stat">XX</span></li>
+                        <!--HP is dynamically created-->
                     </ul>
                     <h2>Equipment</h2>
-                    <ul>
-                        <li>Weapon: <span id="p-weapon" class="player-info">None</span></li>
-                        <li>Armor: <span id="p-armor" class="player-info">None</span></li>
+                    <ul id="p-equipped">
+                        <li>Weapon: <span id="p-weapon" class="player-equip">None</span></li>
+                        <li>Armor: <span id="p-armor" class="player-equip">None</span></li>
+                        <ul id="p-inventory">
+
+                        </ul>
+
                     </ul>
                 </div>
                 <nav id="menu">
@@ -65,7 +69,18 @@
                     </ul>
                 </nav>
                 <div id="display">DISPLAY</div>
-                <div id="actions">ACTIONS</div>
+                <div id="actions">
+                    <ul id="combat-buttons">
+                        <li><button id="combat-attack">Attack</button></li>
+                        <li><button id="combat-defend">Defend</button></li>
+                        <li><button id="combat-magic">Magic</button></li>
+                        <li><button id="combat-flee">Flee</button></li>
+                    </ul>
+                    <ul id="game-buttons">
+                        <li><button>Inventory</button></li>
+                        <li><button>Magic</button></li>
+                    </ul>
+                </div>
                 <div id="console">Console</div>
             </div>
         </main>
