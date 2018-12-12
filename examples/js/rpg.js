@@ -2,39 +2,47 @@
 /*Javascript for RPG
  * This is the core document which essentially will act like a main()
  * Some ES6 features are used.
-    * Class
+ * Class
  */
 /*--------TABLE OF CONTENTS-------
-*   DOM Variables
-*   CLASS DECLARATIONS
-*   FUNCTIONALITY
-*   EVENT HANDLERS
-*   UTILITIES
-*
-*/
+ *   DOM Variables
+ *   CLASS DECLARATIONS
+ *   FUNCTIONALITY
+ *   EVENT HANDLERS
+ *   UTILITIES
+ *
+ */
 
 //TODO create an actual order to the code to make this mess make sense.
 
 //Grabbing document elements for use in DOM manipulation
-const STATBAR = document.getElementById("player-info");
 const MAINMENU = document.getElementById("menu-main");
 const CHARCREATE = document.getElementById("char-creation");
 const CHARCREATEBTN = document.getElementById("create-character");
 const CHARCREATEFORM = document.getElementById("create-form");
+const CREATEBACKBTN = document.getElementById("create-back");
 const GAMESCREEN = document.getElementById("game-display");
 
-
+//Character information in Sidebar
 const CHARNAME = document.getElementById("p-name");
 const PLAYERINFO = document.getElementById("player-info");
+const PLAYERHEALTH = document.getElementById("p-hp");
 
+//In-game navigation buttons
+const NAVMENU = document.getElementById("menu-nav");
+const DISPLAY = document.getElementById("display");
+
+//Combat Buttons
+const COMBATMENU = document.getElementById("combat-menu");
 
 class Actor {
     //The actor is the most used object for this game. It defines Heroes and monsters and is the basis for every other living thing.
-    constructor(name, health, attack, gold) {
+    constructor(name, health, attack, defense, gold) {
         this.name = name;
         this.maxhealth = health;
         this.health = health;
         this.attack = attack;
+        this.defense = defense;
         //String showing what the person attacks with.
         this.gold = gold; //This is used as the gold available/looted upon death
     }
@@ -44,7 +52,8 @@ class Actor {
 
     }
     dealDamage(target) {
-        target.takedamage(this.attack);
+        var damage = (this.attack - target.defense);
+        target.takeDamage(damage);
     }
 
     takeDamage(damage) {
@@ -62,17 +71,26 @@ class Actor {
     //Stats
 }
 class Hero extends Actor {
-    constructor(name, health, attack, gold) {
-        super(name, health, attack, gold);
-        this.inventory = [];
-        this.equipped = [];
+    constructor(name, health, attack, defense, gold) {
+        super(name, health, attack, defense, gold);
+        //Equipment and inventory may get canned.
+        this.inventory = [
+        ];
+        this.equipped = [
+            {
+                "armor": "none",
+                "protection": 0,
+            },
+            {
+                "weapon": "none",
+                "damage": 2
+            }
+        ];
     }
     displayStats() {
         CHARNAME.innerHTML = this.name;
-        //show health
-        var hp = make(["li", ["span", "HP: ", this.health, "/", this.maxhealth]]);
-        PLAYERINFO.appendChild(hp);
-        console.log(STATBAR);
+
+        PLAYERHEALTH.innerHTML = this.health + "/" + this.maxhealth;
     }
     displayEquipment() {
 
@@ -80,85 +98,195 @@ class Hero extends Actor {
     displayInventory() {
 
     }
+    /* save to localStorage */
+    save() {
+        localStorage.setItem("hero-name", hero.name);
+        localStorage.setItem("hero-health", hero.maxhealth);
+        localStorage.setItem("hero-attack", hero.attack);
+        localStorage.setItem("hero-gold", hero.gold);
+        localStorage.setItem("hero-inventory", hero.inventory);
+        localStorage.setItem("hero-equipped", hero.name);
+        console.log("Saved character: ", localStorage.getItem("hero-name"));
+    }
+    /* load from localStorage */
+    load() {
+        this.name = localStorage.getItem("hero-name");
+        this.maxhealth = localStorage.getItem("hero-health");
+        this.attack = localStorage.getItem("hero-attack");
+        this.gold = localStorage.getItem("hero-gold");
+        this.inventory = localStorage.getItem("hero-inventory");
+        this.equipped = localStorage.getItem("hero-equpped");
+        console.log("Hero loaded: ", hero);
+        console.log(hero.name);
+        this.displayStats();
+    }
+    toString() {
+        var x = this.name;
+        return x;
+
+    }
 }
 
 /* FUNCTIONALITY */
 
-
-function createActor(targetActor, charData) {
-   //Updates the player character with the new data from the character creation form
-    targetActor.name = charData;
-    targetActor
-}
 function createCharFromForm() {
     //Character Creation
 
     //collect data from form
     hero.name = document.getElementById("create-name").value;
     //document.getElementById("create-profession").value];
-//    document.getElementById("results").innerHTML = text;
-//    document.getElementById("results").classList.toggle("hide");
-    //TODO display stats to the side during character creation(Diablo Style)
-    //This will use createElement() to dynamically create it
-    //There is no need to hardcode it. this can use one of the transitions.
-
-    //Spit the character to the global variable
     hero.displayStats();
     CHARCREATE.classList.toggle("hide");
     GAMESCREEN.classList.toggle("hide");
 }
 
+//Load and save
+/* loadJSON -- Modified from w3schools*/
+function loadJSONDoc() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            document.getElementById("display").innerHTML = this.responseText;
+            return JSON.parse(this.responseText);
+        }
+    };
+    xhttp.open("GET", "json/rpg-data.json", true);
+    xhttp.send();
+}
+
+
 /* !!!!! EVENT HANDLERS !!!!! */
 //Main menu event handler(probably more menus eventually)
-function menu(e, menuname) {
+function menu(e) {
     if (e.target && e.target.nodeName == "BUTTON") {
         //Do the things to the target
         var menuSelection = e.target.id;
         console.log(menuSelection);
         console.log("List item ", e.target.id.replace("post-", ""), " was clicked!");
-        switch(menuSelection) {
+        switch (menuSelection) {
             case "menu-new-game":
                 MAINMENU.classList.toggle("hide");
                 CHARCREATE.classList.toggle("hide");
                 break;
             case "menu-load-game":
                 MAINMENU.classList.toggle("hide");
-                hero.displayStats();
+                hero.load();
                 GAMESCREEN.classList.toggle("hide");
                 break;
             case "menu-option":
                 //Show options as a modal or something
                 break;
-            case "menu-creadits":
+            case "menu-credits":
                 //Show credits
+                break;
+            case "new-adventure":
+                startCombat(goblin);
+                break;
+            case "to-town":
+                //display shop
+                break;
+            case "save-game":
+                hero.save();
+                break;
+            case "menu-back":
+                showMain("game");
                 break;
             default:
                 //Do nothing (drop the event)
                 break;
         }
-
     }
     e.stopPropagation();
 }
+
+
+function combatInput(e, monster) {
+    if (e.target && e.target.nodeName == "BUTTON") {
+        //Do the things to the target
+        var menuSelection = e.target.id;
+        console.log(menuSelection);
+        console.log("List item ", e.target.id.replace("post-", ""), " was clicked!");
+        switch (menuSelection) {
+            case "combat-attack":
+                hero.dealDamage(monster);
+                monster.dealDamage(hero);
+                break;
+            case "combat-defend":
+                hero.defense = hero.defense * 2;
+                monster.dealDamage(hero);
+                hero.defense = hero.defense / 2;
+                break;
+            case "combat-flee":
+                var fleeChance = Math.floor(Math.random() * 10);
+                if (fleeChance > 4) {
+                    //60% chance flat
+                    endCombat();
+                } else {
+                    //display failed attempt
+                }
+
+                break;
+            default:
+                //do nothing (drop the event)
+                break;
+        }
+    }
+    e.stopPropagation();
+}
+
+function startCombat(monster) {
+    var intro = make(["p", "Before you stands a ", monster.name, ". It looks angry!"]);
+    DISPLAY.appendChild(intro);
+    // activate the event handler
+    COMBATMENU.addEventListener("click", function(e) {
+        combatInput(e, monster);
+    }, false);
+    // display the buttons
+    COMBATMENU.classList.toggle("hide");
+
+
+}
+
+function endCombat() {
+
+}
+
 //Main Menu listener    ----    Parent based listener
 document.getElementById("menu-main-list").addEventListener("click", menu, false);
+NAVMENU.addEventListener("click", menu, false);
 /*form Event listeners */
-//Removes the ability to use the keypress
-CHARCREATEFORM.onkeypress = function(e) {
+//Removes the ability to use the keypress and remaps to "submit" the form.
+CHARCREATEFORM.onkeypress = function (e) {
     var key = e.charCode || e.keyCode || 0;
     if (key == 13) {
         e.preventDefault();
         createCharFromForm();
     }
-}
+};
 CHARCREATEBTN.addEventListener("click", createCharFromForm);
+CREATEBACKBTN.addEventListener("click", function () {
+    showMain("char-create");
+});
 
+//MENUBACK.addEventListener("click", showMain);
+
+
+/* ****** COMBAT ******* */
 
 
 
 
 /*Utilities */
 
+function showMain(currentView) {
+    if (currentView === "char-create") {
+        CHARCREATE.classList.toggle("hide");
+        MAINMENU.classList.toggle("hide");
+    } else if (currentView === "game") {
+        GAMESCREEN.classList.toggle("hide");
+        MAINMENU.classList.toggle("hide");
+    }
+}
 
 /*This is my lightweight version of the make function below I may switch over once I feel comfortable with make's structure.*/
 function newElement(element, text, parent) {
@@ -166,14 +294,14 @@ function newElement(element, text, parent) {
     var el = document.createElement(element);
     var t = document.createTextNode(text);
     el.appendChild(t);
-    document.getElementById(parent).appendChild(el)
+    document.getElementById(parent).appendChild(el);
 }
 
 //Other people's code
 //Matthew Crumley's make function
 //Called like this
 //make(["p", "Here is a ", ["a", { href:"http://www.google.com/" }, "link"], "."]);
-//Displays:
+//Returns:
 //<p>Here is a <a href="http://www.google.com/">link</a>.</p>
 function isArray(a) {
     return Object.prototype.toString.call(a) === "[object Array]";
@@ -200,8 +328,7 @@ function make(desc) {
     for (var i = start; i < desc.length; i++) {
         if (isArray(desc[i])) {
             el.appendChild(make(desc[i]));
-        }
-        else {
+        } else {
             el.appendChild(document.createTextNode(desc[i]));
         }
     }
@@ -214,4 +341,5 @@ function make(desc) {
 //Pending on Object completion to allow for easy insertion
 //var serverData = loadJSONDoc(); //Loads the JSON file to a JS Object
 
-var hero = new Hero("Hadvar", 25, 5, 20); //Placeholder object put Hero into Global scope. Also determines base stats.
+var hero = new Hero("Hadvar", 25, 5, 2, 20); //Placeholder object put Hero into Global scope. Also determines base stats.
+var goblin = new Actor("Goblin", 5, 3, 1, 10);

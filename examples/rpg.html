@@ -39,15 +39,17 @@
                           <option value="Ranger">Ranger</option>
                       </select>
                    </p>
--->
-                   <input type="button" value="Create Character!" id="create-character">
+<-->
                </form>
+               <button id="create-back">Back to Title</button>
+               <button id="create-character">Create Character!</button>
                <div id="results" class="hide">Results will display here!</div>
            </div>
             <div class="grid-wrapper hide" id="game-display">
                 <div id="stats">
                     <h1 id="p-name">Player</h1>
                     <ul id="player-info">
+                       <li>HP: <span id="p-hp"></span></li>
                         <!--HP is dynamically created-->
                     </ul>
                     <h2>Equipment</h2>
@@ -60,25 +62,24 @@
 
                     </ul>
                 </div>
-                <nav id="menu">
+                <nav>
                     <h2>Navigation</h2>
-                    <ul>
-                        <li><button id="new-adventure" class="ingame-button">Adventure</button></li>
-                        <li><button id="to=town"  class="ingame-button">Town</button></li>
+                    <ul id="menu-nav">
+                        <li><button id="new-adventure" class="ingame-button">New Adventure</button></li>
+                        <li><button id="to-town"  class="ingame-button">Go to Town</button></li>
                         <li><button id="save-game"  class="ingame-button">Save</button></li>
+                        <li><button id="menu-back"  class="ingame-button">Return to Title</button></li>
                     </ul>
                 </nav>
                 <div id="display">DISPLAY</div>
                 <div id="actions">
-                    <ul id="combat-buttons">
+                    <ul id="combat-menu" class="hide">
                         <li><button id="combat-attack">Attack</button></li>
                         <li><button id="combat-defend">Defend</button></li>
-                        <li><button id="combat-magic">Magic</button></li>
                         <li><button id="combat-flee">Flee</button></li>
                     </ul>
                     <ul id="game-buttons">
                         <li><button>Inventory</button></li>
-                        <li><button>Magic</button></li>
                     </ul>
                 </div>
                 <div id="console">Console</div>
@@ -86,7 +87,11 @@
         </main>
         <footer>
             <p><small>2018 &copy; Micah Clegg, All rights reserved.</small></p>
+            <p><a href="" title="View the JavaScript code in GitHub">View the Source Code</a></p>
         </footer>
+        <div id="audio-list">
+            <audio src="assets/audio/hits/hit01.mp3" type="audio/mp3"></audio>
+        </div>
         <script type="text/javascript" src="js/rpg.js"></script>
     </div>
 </body>
