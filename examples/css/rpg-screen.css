@@ -1,88 +1,124 @@
-*, *:before, *:after {
+*,
+*:before,
+*:after {
     box-sizing: inherit;
 }
-html, body {
+
+html,
+body {
     width: 100%;
     height: 100%;
     background-color: darkgray;
 }
-header>h1, footer{
+header {
+    height: 5vh;
+}
+header > h1,
+footer {
     text-align: center;
 }
+
 main {
     margin: auto;
     max-width: 1100px;
     background-color: white;
 }
-main>div {
+
+main > div {
     height: auto;
+    width: 95vw;
     border: 5px solid green;
     text-align: center;
     padding: 1em;
 }
+
 #main-menu {
     margin: auto;
     display: flex;
     flex-direction: column;
     text-align: center;
 }
-#main-menu * {
 
-}
+#main-menu * {}
+
 .grid-wrapper {
-    width: 100%;
-    height: 100%;
-    max-width: 95vw;
+    height: 80vh;
     display: grid;
     grid-template-columns: 2fr 3fr;
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 25%);
     grid-gap: 10px;
     padding: 10px;
     text-align: center;
     /*grid gap will be based on border rather than using a grid gap*/
     background-color: gray;
 }
-.grid-wrapper>* {
-    padding: 20px 0;
+
+.grid-wrapper > * {
+    background-color: black;
+    color: white;
+    border: 5px white solid;
+    border-radius: 10px;
 }
-.grid-wrapper *:nth-child(odd) {
-    background-color: aqua;
-}
-.grid-wrapper:nth-child(even) {
-    background-color: teal;
-}
-#stats{
-    grid-row: 1/ 3;
+
+.stats {
+    grid-row: 1/ 2;
     grid-column: 1;
 }
-#stats>h1, #stats>h2 {
+
+.stats > h1,
+.stats > h2 {
     line-height: .5em;
 }
-#menu{
+
+.menu {
     grid-column: 1 / 2;
-    grid-row: 3 / 4;
+    grid-row: 2 / 3;
 }
-#display {
-    grid-column: 2 / 3;
+
+.display {
+    grid-column: 2;
     grid-row: 1 / 3;
-    background-color: white;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
-#actions{
-    max-height: 20%;
-    background-color: slategray;
+.picture {
+    flex-grow: 1;
 }
-#console{
-    background-color: white;
-    grid-column: 2 / 3;
+.actions {
+    width: auto;
+    margin: auto;
+    background-color: black;
+    align-self: flex-end;
+    border: 5px solid white;
+    border-radius: 15px;
 }
-.bottom {
-    grid-column: 2 / 5;
+
+.actions {
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+.actions button {
+    width: 50px;
+    height: 40px;
+}
+.console {
+    background-color: black;
+    max-height: 90%;
     grid-row: 3 / 5;
+    grid-column: 1 / 3;
+
+    overflow: scroll;
+    overflow-x: hidden;
 }
 
 ul {
     padding-left: 0;
 }
+
 li {
     list-style: none;
 }
@@ -96,8 +132,25 @@ li {
 button {
     width: 5em;
 }
+
 input {
     width: 10em;
 }
+.disabled {
+    background: #F5F5F5;
+    color : #C3C3C3;
+    cursor:none;
+    pointer-events: none;
+}
 
-#char-creation
+#char-creation {}
+
+footer {
+    height: 5vh;
+}
+@media screen and (max-width: 600px) {
+
+    .actions>ul {
+        flex-direction: row;
+    }
+}

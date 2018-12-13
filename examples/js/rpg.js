@@ -15,6 +15,17 @@
 
 //TODO create an actual order to the code to make this mess make sense.
 
+//TODO Combat cleanup --> reset DONE reset has been accomplished by healing the monster, now the only thing left to do is to modularly set the stats of the monster, should be pretty easy with a setStats function belonging to the Actor Class
+//TODO JSON --> build creatures from JSON
+//TODO Town --> Resting, Buying items built from JSON
+//TODO Options ---> CSS overhaul
+//TODO Credits --> Video of scrolling text
+//TODO Audio --> on attack, on rest, on purchase, on death (Character and otherwise)
+//TODO Canvas --> Portrait or something
+//TODO Animations --> Attack, TakeDamage(Screenshake), Waiting for all of that to happen, Menu animations,
+//TODO Transitions --> 3 transitions from each view plus perhaps something for the console, make it write it out maybe.
+//transforms
+
 //Grabbing document elements for use in DOM manipulation
 const MAINMENU = document.getElementById("menu-main");
 const CHARCREATE = document.getElementById("char-creation");
@@ -22,18 +33,33 @@ const CHARCREATEBTN = document.getElementById("create-character");
 const CHARCREATEFORM = document.getElementById("create-form");
 const CREATEBACKBTN = document.getElementById("create-back");
 const GAMESCREEN = document.getElementById("game-display");
+const CONSOLE = document.getElementById("console");
+const LOADBTN = document.getElementById("menu-load-game");
 
 //Character information in Sidebar
 const CHARNAME = document.getElementById("p-name");
 const PLAYERINFO = document.getElementById("player-info");
 const PLAYERHEALTH = document.getElementById("p-hp");
+const PLAYERGOLD = document.getElementById("p-gold");
 
 //In-game navigation buttons
+const INGAMEBUTTONS = document.getElementsByClassName("ingame-button");
 const NAVMENU = document.getElementById("menu-nav");
 const DISPLAY = document.getElementById("display");
+const DISPLAYIMG = document.getElementById("picture-box");
 
-//Combat Buttons
+//Combat elements
+const COMBATBUTTONS = document.getElementsByClassName("combat-button");
 const COMBATMENU = document.getElementById("combat-menu");
+const COMBATTEXT = document.getElementById("combat-text");
+
+//Town elements
+const TOWNINTERFACE = document.getElementById("town-interface");
+const REST = document.getElementById("rest");
+
+//Globals to "turn off" Event handlers
+var inputPause = false; //True turns navigation buttons off and turns combat on
+var loadbtnset = localStorage.getItem("saved");
 
 class Actor {
     //The actor is the most used object for this game. It defines Heroes and monsters and is the basis for every other living thing.
@@ -48,18 +74,32 @@ class Actor {
     }
     //Inventory and Equipped Items may be held in a different object, however they do still belong to the character.
     //Stats have been cut for simplicity's sake
-    displayActorStats() {
-
-    }
     dealDamage(target) {
+        gameConsoleLog(["p", this.name, " attacks ", target.name, "."]);
         var damage = (this.attack - target.defense);
+        if(damage < 0) {
+            damage = 0;
+        }
         target.takeDamage(damage);
     }
 
     takeDamage(damage) {
-        this.health = this.health - damage;
+        this.health -= damage;
+        gameConsoleLog(["p", this.name, " takes ", damage, " damage."]);
         if (this.health <= 0) {
             console.log(this.name + " is dead!");
+            gameConsoleLog(["p", this.name, " has died!"]);
+            this.health = 0;
+        }
+    }
+    takeGold(gold) {
+        this.gold = Number(this.gold) + gold;
+        gameConsoleLog(["p", this.name, " takes ", gold, " gold pieces!"]);
+    }
+    heal(healamount) {
+        this.health = Number(this.health) + healamount;
+        if(this.health > this.maxhealth) {
+            this.health = this.maxhealth;
         }
     }
     //Get Functions
@@ -91,6 +131,7 @@ class Hero extends Actor {
         CHARNAME.innerHTML = this.name;
 
         PLAYERHEALTH.innerHTML = this.health + "/" + this.maxhealth;
+        PLAYERGOLD.innerHTML = this.gold;
     }
     displayEquipment() {
 
@@ -106,7 +147,9 @@ class Hero extends Actor {
         localStorage.setItem("hero-gold", hero.gold);
         localStorage.setItem("hero-inventory", hero.inventory);
         localStorage.setItem("hero-equipped", hero.name);
+        localStorage.setItem("saved", "true");
         console.log("Saved character: ", localStorage.getItem("hero-name"));
+        gameConsoleLog(["p", "Game Saved!"]);
     }
     /* load from localStorage */
     load() {
@@ -118,6 +161,7 @@ class Hero extends Actor {
         this.equipped = localStorage.getItem("hero-equpped");
         console.log("Hero loaded: ", hero);
         console.log(hero.name);
+        gameConsoleLog(["p", this.name, " Loaded!"]);
         this.displayStats();
     }
     toString() {
@@ -135,6 +179,7 @@ function createCharFromForm() {
     //collect data from form
     hero.name = document.getElementById("create-name").value;
     //document.getElementById("create-profession").value];
+    hero.save();
     hero.displayStats();
     CHARCREATE.classList.toggle("hide");
     GAMESCREEN.classList.toggle("hide");
@@ -146,7 +191,7 @@ function loadJSONDoc() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
-            document.getElementById("display").innerHTML = this.responseText;
+            DISPLAY.innerHTML = this.responseText;
             return JSON.parse(this.responseText);
         }
     };
@@ -156,9 +201,61 @@ function loadJSONDoc() {
 
 
 /* !!!!! EVENT HANDLERS !!!!! */
+
+
+function startCombat() {
+    toggleInputPause();
+
+    //Choose random monster
+    //Setup monster from JSON data
+    console.log("monster stats", monster.health);
+    var intro = "Before you stands a " + monster.name + ". It looks angry!";
+    COMBATTEXT.innerHTML = intro;
+    COMBATTEXT.classList.toggle("hide");
+    //Display img's source gets whatever image is related to the monster.
+    DISPLAYIMG.classList.toggle("hide");
+    // display the buttons
+    COMBATMENU.classList.toggle("hide");
+
+    //Problem with the faulty logic was the event listeners not being properly turned on and off so instead I went with the approach of relying upon toggleInputPause to 'Turn' them on and off
+}
+
+function endCombat(monster) {
+    toggleInputPause();
+    //remove monster / reset monster
+
+    //
+    COMBATMENU.classList.toggle("hide");
+    COMBATTEXT.classList.toggle("hide");
+    DISPLAYIMG.classList.toggle("hide");
+}
+
+//Main Menu listener    ----    Parent based listener
+document.getElementById("menu-main-list").addEventListener("click", menu, false);
+NAVMENU.addEventListener("click", menu, false);
+
+//Set the return key to "submit" the char-create form
+CHARCREATEFORM.onkeypress = function (e) {
+    var key = e.charCode || e.keyCode || 0;
+    if (key == 13) {
+        e.preventDefault();
+        createCharFromForm();
+    }
+};
+CHARCREATEBTN.addEventListener("click", createCharFromForm);
+CREATEBACKBTN.addEventListener("click", function () {
+    showMain("char-create");
+});
+COMBATMENU.addEventListener("click", function(e) {
+    combatInput(e);
+}, false);
+
+REST.addEventListener("click", menu, false);
 //Main menu event handler(probably more menus eventually)
 function menu(e) {
-    if (e.target && e.target.nodeName == "BUTTON") {
+    if (inputPause === true) {
+        //De nothing
+    } else if (e.target && e.target.nodeName == "BUTTON") {
         //Do the things to the target
         var menuSelection = e.target.id;
         console.log(menuSelection);
@@ -180,10 +277,13 @@ function menu(e) {
                 //Show credits
                 break;
             case "new-adventure":
-                startCombat(goblin);
+                startCombat();
                 break;
             case "to-town":
-                //display shop
+                TOWNINTERFACE.classList.toggle("hide");
+                break;
+            case "rest":
+                hero.heal(999);
                 break;
             case "save-game":
                 hero.save();
@@ -198,10 +298,10 @@ function menu(e) {
     }
     e.stopPropagation();
 }
-
-
-function combatInput(e, monster) {
-    if (e.target && e.target.nodeName == "BUTTON") {
+function combatInput(e) {
+    if (inputPause === false) {
+        //Do nothing
+    } else if (e.target && e.target.nodeName == "BUTTON") {
         //Do the things to the target
         var menuSelection = e.target.id;
         console.log(menuSelection);
@@ -209,17 +309,27 @@ function combatInput(e, monster) {
         switch (menuSelection) {
             case "combat-attack":
                 hero.dealDamage(monster);
-                monster.dealDamage(hero);
+                //After 2 monsters they don't regen health. Weird.
+                if (monster.health > 0) {
+                    monster.dealDamage(hero);
+                    hero.displayStats();
+                } else if (monster.health <= 0) {
+                    hero.takeGold(monster.gold);
+                    hero.displayStats();
+                    monster.heal(999);
+                    endCombat(monster);
+                }
                 break;
             case "combat-defend":
                 hero.defense = hero.defense * 2;
                 monster.dealDamage(hero);
                 hero.defense = hero.defense / 2;
+                hero.displayStats();
                 break;
             case "combat-flee":
                 var fleeChance = Math.floor(Math.random() * 10);
-                if (fleeChance > 4) {
-                    //60% chance flat
+                if (fleeChance > 2) {
+                    //80% chance flat
                     endCombat();
                 } else {
                     //display failed attempt
@@ -234,39 +344,17 @@ function combatInput(e, monster) {
     e.stopPropagation();
 }
 
-function startCombat(monster) {
-    var intro = make(["p", "Before you stands a ", monster.name, ". It looks angry!"]);
-    DISPLAY.appendChild(intro);
-    // activate the event handler
-    COMBATMENU.addEventListener("click", function(e) {
-        combatInput(e, monster);
-    }, false);
-    // display the buttons
-    COMBATMENU.classList.toggle("hide");
+function toggleInputPause() {
+    inputPause = !inputPause;
 
-
-}
-
-function endCombat() {
-
-}
-
-//Main Menu listener    ----    Parent based listener
-document.getElementById("menu-main-list").addEventListener("click", menu, false);
-NAVMENU.addEventListener("click", menu, false);
-/*form Event listeners */
-//Removes the ability to use the keypress and remaps to "submit" the form.
-CHARCREATEFORM.onkeypress = function (e) {
-    var key = e.charCode || e.keyCode || 0;
-    if (key == 13) {
-        e.preventDefault();
-        createCharFromForm();
+    for (var x = 0; x < INGAMEBUTTONS.length; x++) {
+        INGAMEBUTTONS[x].classList.toggle("disabled");
     }
-};
-CHARCREATEBTN.addEventListener("click", createCharFromForm);
-CREATEBACKBTN.addEventListener("click", function () {
-    showMain("char-create");
-});
+    for (var y = 0; y < COMBATBUTTONS.length; y++) {
+        COMBATBUTTONS[y].classList.toggle("disabled");
+    }
+    console.log("input toggled!");
+}
 
 //MENUBACK.addEventListener("click", showMain);
 
@@ -277,6 +365,11 @@ CREATEBACKBTN.addEventListener("click", function () {
 
 
 /*Utilities */
+function gameConsoleLog(data) {
+    var results = make(data);
+    CONSOLE.appendChild(results);
+    CONSOLE.scrollTop = CONSOLE.scrollHeight;
+}
 
 function showMain(currentView) {
     if (currentView === "char-create") {
@@ -295,6 +388,12 @@ function newElement(element, text, parent) {
     var t = document.createTextNode(text);
     el.appendChild(t);
     document.getElementById(parent).appendChild(el);
+}
+
+function removeElement(elementId) {
+    // Removes an element from the document
+    var element = document.getElementById(elementId);
+    element.parentNode.removeChild(element);
 }
 
 //Other people's code
@@ -341,5 +440,9 @@ function make(desc) {
 //Pending on Object completion to allow for easy insertion
 //var serverData = loadJSONDoc(); //Loads the JSON file to a JS Object
 
+
 var hero = new Hero("Hadvar", 25, 5, 2, 20); //Placeholder object put Hero into Global scope. Also determines base stats.
-var goblin = new Actor("Goblin", 5, 3, 1, 10);
+let monster = new Actor("Goblin", 5, 3, 1, 10);
+if(loadbtnset === "true") {
+    LOADBTN.classList.toggle("disabled");
+}
