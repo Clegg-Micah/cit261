@@ -1,4 +1,4 @@
-/*eslint-env browser, es6*/
+/*eslint-env browser, es6, console*/
 /*Javascript for RPG
  * This is the core document which essentially will act like a main()
  * Some ES6 features are used.
@@ -25,6 +25,8 @@
 //TODO Animations --> Attack, TakeDamage(Screenshake), Waiting for all of that to happen, Menu animations,
 //TODO Transitions --> 3 transitions from each view plus perhaps something for the console, make it write it out maybe.
 //transforms
+
+const JSONFILE = "../json/rpg-data.json";
 
 //Grabbing document elements for use in DOM manipulation
 const MAINMENU = document.getElementById("menu-main");
@@ -77,11 +79,24 @@ class Actor {
     dealDamage(target) {
         gameConsoleLog(["p", this.name, " attacks ", target.name, "."]);
         var damage = (this.attack - target.defense);
-        if(damage < 0) {
+        if (damage < 0) {
             damage = 0;
+        }
+        if (target.name === "Goblin") {
+            DISPLAYIMG.classList.toggle("slash");
+            setTimeout(function () {
+                DISPLAYIMG.classList.toggle("slash");
+            }, 1000);
+        }
+        if (this.name === "Goblin") {
+            GAMESCREEN.classList.toggle("shake");
+            setTimeout(function () {
+                GAMESCREEN.classList.toggle("shake");
+            }, 250);
         }
         target.takeDamage(damage);
     }
+
 
     takeDamage(damage) {
         this.health -= damage;
@@ -91,14 +106,28 @@ class Actor {
             gameConsoleLog(["p", this.name, " has died!"]);
             this.health = 0;
         }
+
     }
-    takeGold(gold) {
+    giveGold(gold) {
         this.gold = Number(this.gold) + gold;
         gameConsoleLog(["p", this.name, " takes ", gold, " gold pieces!"]);
     }
+    payGold(gold) {
+        var canPay = true;
+        this.gold = Number(this.gold) - gold;
+        if (this.gold < 0) {
+            canPay = false;
+            this.gold = Number(this.gold) + gold;
+            gameConsoleLog(["p", this.name, " cannot pay for that!"]);
+        } else {
+            canPay = true;
+            gameConsoleLog(["p", this.name, " pays ", gold, " gold pieces!"]);
+        }
+        return canPay;
+    }
     heal(healamount) {
         this.health = Number(this.health) + healamount;
-        if(this.health > this.maxhealth) {
+        if (this.health > this.maxhealth) {
             this.health = this.maxhealth;
         }
     }
@@ -150,6 +179,7 @@ class Hero extends Actor {
         localStorage.setItem("saved", "true");
         console.log("Saved character: ", localStorage.getItem("hero-name"));
         gameConsoleLog(["p", "Game Saved!"]);
+        setInterval(hero.save(), 60000);
     }
     /* load from localStorage */
     load() {
@@ -192,7 +222,9 @@ function loadJSONDoc() {
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             DISPLAY.innerHTML = this.responseText;
-            return JSON.parse(this.responseText);
+            console.log(JSON.parse(this.responseText));
+        } else {
+            console.log("JSON was unsuccessful");
         }
     };
     xhttp.open("GET", "json/rpg-data.json", true);
@@ -225,9 +257,15 @@ function endCombat(monster) {
     //remove monster / reset monster
 
     //
-    COMBATMENU.classList.toggle("hide");
-    COMBATTEXT.classList.toggle("hide");
-    DISPLAYIMG.classList.toggle("hide");
+    if (monster.name === "Goblin") {
+        DISPLAYIMG.classList.toggle("flash");
+        setTimeout(function () {
+            DISPLAYIMG.classList.toggle("flash");
+            COMBATMENU.classList.toggle("hide");
+            COMBATTEXT.classList.toggle("hide");
+            DISPLAYIMG.classList.toggle("hide");
+        }, 2000);
+    }
 }
 
 //Main Menu listener    ----    Parent based listener
@@ -246,7 +284,7 @@ CHARCREATEBTN.addEventListener("click", createCharFromForm);
 CREATEBACKBTN.addEventListener("click", function () {
     showMain("char-create");
 });
-COMBATMENU.addEventListener("click", function(e) {
+COMBATMENU.addEventListener("click", function (e) {
     combatInput(e);
 }, false);
 
@@ -277,13 +315,21 @@ function menu(e) {
                 //Show credits
                 break;
             case "new-adventure":
+                TOWNINTERFACE.classList.add("hide");
                 startCombat();
                 break;
             case "to-town":
                 TOWNINTERFACE.classList.toggle("hide");
                 break;
             case "rest":
-                hero.heal(999);
+                if (hero.payGold(5)) {
+                    if (hero.health === hero.maxhealth) {
+                        gameConsoleLog(["p", hero.name, " is already at max health"]);
+                    } else {
+                        hero.heal(999);
+                        hero.displayStats();
+                    }
+                }
                 break;
             case "save-game":
                 hero.save();
@@ -298,6 +344,7 @@ function menu(e) {
     }
     e.stopPropagation();
 }
+
 function combatInput(e) {
     if (inputPause === false) {
         //Do nothing
@@ -314,7 +361,7 @@ function combatInput(e) {
                     monster.dealDamage(hero);
                     hero.displayStats();
                 } else if (monster.health <= 0) {
-                    hero.takeGold(monster.gold);
+                    hero.giveGold(monster.gold);
                     hero.displayStats();
                     monster.heal(999);
                     endCombat(monster);
@@ -435,14 +482,37 @@ function make(desc) {
     return el;
 }
 
+function getData(target) {
+    console.log("target is: " + target);
+    fetch(JSONFILE)
+        .then(response => response.json())
+        .then(function (data) {
+
+            console.log("This is the Json Object in the getData function");
+            console.log(data);
+            console.log("This is JSON's target" + data[target]);
+            //        Catch garbage and place placeholder title
+            if (target == "undefined" || target.includes("<ul>")) {
+                //DO something
+            }
+            data = data[target];
+            console.log("Inside of data target");
+            console.log(data);
+            serverData = JSON.parse(data);
+            console.log(serverData);
+        })
+
+        .catch(error => console.log('Error:', error));
+}
+
+
 /* Initiating commands */
 
 //Pending on Object completion to allow for easy insertion
-//var serverData = loadJSONDoc(); //Loads the JSON file to a JS Object
-
-
+getData("monsters"); //Loads the JSON file to a JS Object
 var hero = new Hero("Hadvar", 25, 5, 2, 20); //Placeholder object put Hero into Global scope. Also determines base stats.
 let monster = new Actor("Goblin", 5, 3, 1, 10);
-if(loadbtnset === "true") {
+if (loadbtnset === "true") {
     LOADBTN.classList.toggle("disabled");
 }
+

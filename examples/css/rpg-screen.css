@@ -20,7 +20,6 @@ footer {
 
 main {
     margin: auto;
-    max-width: 1100px;
     background-color: white;
 }
 
@@ -38,8 +37,6 @@ main > div {
     flex-direction: column;
     text-align: center;
 }
-
-#main-menu * {}
 
 .grid-wrapper {
     height: 80vh;
@@ -85,6 +82,14 @@ main > div {
 }
 .picture {
     flex-grow: 1;
+    background-image: url("../assets/img/monster_goblin.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center
+}
+img {
+    width:auto;
+    height: 100%;
 }
 .actions {
     width: auto;
@@ -131,6 +136,34 @@ li {
 /* Buttons and Forms */
 button {
     width: 5em;
+    height: 2em;
+    position: relative;
+}
+.ingame-button:before {
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 25%;
+    width: 0;
+    border-left: 10px solid transparent;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid transparent;
+}
+.ingame-button:hover.ingame-button:before {
+    transition: .75s;
+    border-left: 10px solid white;
+}
+.combat-button {
+    transition: .25s;
+    border: 5px solid transparent;
+}
+.combat-button:hover{
+    border: 5px solid red;
+}
+.combat-button:active {
+    transition: 0s;
+    background-color: red;
 }
 
 input {
@@ -141,6 +174,7 @@ input {
     color : #C3C3C3;
     cursor:none;
     pointer-events: none;
+    transition: 1s;
 }
 
 #char-creation {}
@@ -148,9 +182,37 @@ input {
 footer {
     height: 5vh;
 }
+.flash {
+    animation: flash 2s ease-out forwards;
+}
+@keyframes flash {
+    10% {opacity: 0;}
+    20% {opacity: .5;}
+    30% {opacity: 0;}
+    40% {opacity: .5;}
+    50% {opacity: 1;}
+    100% {opacity: 0;}
+}
+.shake {
+    animation: shake .25s linear 3;
+}
+@keyframes shake {
+    25% {transform: translateX(-1em);}
+    75% {transform: translateX(2em);}
+    100% {transform: translateX(-1em);}
+}
+@keyframes consoletype {
+
+}
 @media screen and (max-width: 600px) {
 
     .actions>ul {
         flex-direction: row;
+    }
+}
+
+@media screen and (max-width: 1100px) {
+    .main *{
+        background-color: red;
     }
 }
