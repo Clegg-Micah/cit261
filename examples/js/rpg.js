@@ -424,6 +424,9 @@ function gameConsoleLog(data) {
 }
 
 function showMain(currentView) {
+    if (loadbtnset === "true") {
+        LOADBTN.classList.remove("disabled");
+    }
     if (currentView === "char-create") {
         CHARCREATE.classList.toggle("hide");
         MAINMENU.classList.toggle("hide");
