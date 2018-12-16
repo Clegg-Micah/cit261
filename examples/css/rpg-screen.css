@@ -10,9 +10,11 @@ body {
     height: 100%;
     background-color: darkgray;
 }
+
 header {
     height: 5vh;
 }
+
 header > h1,
 footer {
     text-align: center;
@@ -41,7 +43,7 @@ main > div {
 .grid-wrapper {
     height: 80vh;
     display: grid;
-    grid-template-columns: 2fr 3fr;
+    grid-template-columns:2fr 3fr;
     grid-template-rows: repeat(4, 25%);
     grid-gap: 10px;
     padding: 10px;
@@ -80,6 +82,7 @@ main > div {
     flex-direction: column;
     align-items: stretch;
 }
+
 .picture {
     flex-grow: 1;
     background-image: url("../assets/img/monster_goblin.png");
@@ -87,10 +90,12 @@ main > div {
     background-repeat: no-repeat;
     background-position: center
 }
+
 img {
-    width:auto;
+    width: auto;
     height: 100%;
 }
+
 .actions {
     width: auto;
     margin: auto;
@@ -106,10 +111,12 @@ img {
     flex-direction: row;
     justify-content: space-around;
 }
+
 .actions button {
     width: 50px;
     height: 40px;
 }
+
 .console {
     background-color: black;
     max-height: 90%;
@@ -139,6 +146,7 @@ button {
     height: 2em;
     position: relative;
 }
+
 .ingame-button:before {
     content: "";
     position: absolute;
@@ -150,17 +158,21 @@ button {
     border-bottom: 10px solid transparent;
     border-right: 10px solid transparent;
 }
+
 .ingame-button:hover.ingame-button:before {
-    transition: .75s;
+    transition: .5s;
     border-left: 10px solid white;
 }
+
 .combat-button {
     transition: .25s;
     border: 5px solid transparent;
 }
-.combat-button:hover{
+
+.combat-button:hover {
     border: 5px solid red;
 }
+
 .combat-button:active {
     transition: 0s;
     background-color: red;
@@ -169,50 +181,91 @@ button {
 input {
     width: 10em;
 }
+
 .disabled {
     background: #F5F5F5;
-    color : #C3C3C3;
-    cursor:none;
+    color: #C3C3C3;
+    cursor: none;
     pointer-events: none;
     transition: 1s;
 }
 
-#char-creation {}
-
 footer {
     height: 5vh;
 }
-.flash {
-    animation: flash 2s ease-out forwards;
-}
-@keyframes flash {
-    10% {opacity: 0;}
-    20% {opacity: .5;}
-    30% {opacity: 0;}
-    40% {opacity: .5;}
-    50% {opacity: 1;}
-    100% {opacity: 0;}
-}
-.shake {
-    animation: shake .25s linear 3;
-}
-@keyframes shake {
-    25% {transform: translateX(-1em);}
-    75% {transform: translateX(2em);}
-    100% {transform: translateX(-1em);}
-}
-@keyframes consoletype {
 
+.player-info>li {
+    transform:scale(1.25);
 }
+.console>p:hover {
+    transition: .25s;
+    transform: scale(1.5);
+}
+
+@keyframes flash {
+
+    /*Actually refers to the death animation of a monster */
+    from {
+        opacity: 1;
+        transform: skewX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: skewX(90deg);
+    }
+}
+
+.shake {
+    animation: shake .5s linear 1;
+    animation-delay: .25s;
+}
+
+@keyframes shake {
+    25% {
+        transform: translateX(-.5em);
+    }
+
+    75% {
+        transform: translateX(1em);
+    }
+
+    100% {
+        transform: translateX(-.5em);
+    }
+}
+
+.slash {
+    animation: slash .5s linear backwards;
+}
+
+@keyframes slash {
+    20% {
+        opacity: 0;
+    }
+
+    40% {
+        opacity: 1;
+    }
+
+    60% {
+        opacity: 0;
+    }
+
+    80% {
+        opacity: 1;
+    }
+}
+
 @media screen and (max-width: 600px) {
 
-    .actions>ul {
+    .actions > ul {
         flex-direction: row;
     }
 }
 
 @media screen and (max-width: 1100px) {
-    .main *{
+    .main * {
         background-color: red;
     }
 }

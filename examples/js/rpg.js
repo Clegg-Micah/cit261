@@ -25,8 +25,9 @@
 //TODO Animations --> Attack, TakeDamage(Screenshake), Waiting for all of that to happen, Menu animations,
 //TODO Transitions --> 3 transitions from each view plus perhaps something for the console, make it write it out maybe.
 //transforms
+//TODO add thing to pause combat input
 
-const JSONFILE = "../json/rpg-data.json";
+const JSONFILE = "../examples/json/rpg-data.json";
 
 //Grabbing document elements for use in DOM manipulation
 const MAINMENU = document.getElementById("menu-main");
@@ -60,17 +61,20 @@ const TOWNINTERFACE = document.getElementById("town-interface");
 const REST = document.getElementById("rest");
 
 //Globals to "turn off" Event handlers
-var inputPause = false; //True turns navigation buttons off and turns combat on
+var inputPause = false; //True turns navigation buttons off and turns combat on\
+var inputPauseCombat = true; //Will eventually be used to toggle combat buttons inside of combat after animations are finished
 var loadbtnset = localStorage.getItem("saved");
+var monsterList = [];
 
 class Actor {
     //The actor is the most used object for this game. It defines Heroes and monsters and is the basis for every other living thing.
-    constructor(name, health, attack, defense, gold) {
+    constructor(name, health, attack, defense, type, gold) {
         this.name = name;
         this.maxhealth = health;
         this.health = health;
         this.attack = attack;
         this.defense = defense;
+        this.type = type; //Used to determine whether it is a PC or NPC
         //String showing what the person attacks with.
         this.gold = gold; //This is used as the gold available/looted upon death
     }
@@ -81,18 +85,11 @@ class Actor {
         var damage = (this.attack - target.defense);
         if (damage < 0) {
             damage = 0;
-        }
-        if (target.name === "Goblin") {
+        } else if (target.type === "Monster") {
             DISPLAYIMG.classList.toggle("slash");
             setTimeout(function () {
                 DISPLAYIMG.classList.toggle("slash");
             }, 1000);
-        }
-        if (this.name === "Goblin") {
-            GAMESCREEN.classList.toggle("shake");
-            setTimeout(function () {
-                GAMESCREEN.classList.toggle("shake");
-            }, 250);
         }
         target.takeDamage(damage);
     }
@@ -100,7 +97,15 @@ class Actor {
 
     takeDamage(damage) {
         this.health -= damage;
+        if (this.type === "Hero") {
+            GAMESCREEN.classList.toggle("shake");
+            gameConsoleLog(["p", this.name, " takes ", damage, " damage."]);
+            setTimeout(function () {
+                GAMESCREEN.classList.toggle("shake");
+            }, 2000);
+        } else {
         gameConsoleLog(["p", this.name, " takes ", damage, " damage."]);
+        }
         if (this.health <= 0) {
             console.log(this.name + " is dead!");
             gameConsoleLog(["p", this.name, " has died!"]);
@@ -140,9 +145,9 @@ class Actor {
     //Stats
 }
 class Hero extends Actor {
-    constructor(name, health, attack, defense, gold) {
-        super(name, health, attack, defense, gold);
-        //Equipment and inventory may get canned.
+    constructor(name, health, attack, defense, type, gold) {
+        super(name, health, attack, defense, type, gold);
+        //Equipment and inventory may get canned. disabled until build 2
         this.inventory = [
         ];
         this.equipped = [
@@ -158,7 +163,6 @@ class Hero extends Actor {
     }
     displayStats() {
         CHARNAME.innerHTML = this.name;
-
         PLAYERHEALTH.innerHTML = this.health + "/" + this.maxhealth;
         PLAYERGOLD.innerHTML = this.gold;
     }
@@ -179,7 +183,6 @@ class Hero extends Actor {
         localStorage.setItem("saved", "true");
         console.log("Saved character: ", localStorage.getItem("hero-name"));
         gameConsoleLog(["p", "Game Saved!"]);
-        setInterval(hero.save(), 60000);
     }
     /* load from localStorage */
     load() {
@@ -217,19 +220,20 @@ function createCharFromForm() {
 
 //Load and save
 /* loadJSON -- Modified from w3schools*/
-function loadJSONDoc() {
+function loadDoc() {
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            DISPLAY.innerHTML = this.responseText;
-            console.log(JSON.parse(this.responseText));
-        } else {
-            console.log("JSON was unsuccessful");
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(this.responseText);
+        }
+        else{
+            console.log("JSON was unsuccessful!");
         }
     };
     xhttp.open("GET", "json/rpg-data.json", true);
     xhttp.send();
 }
+
 
 
 /* !!!!! EVENT HANDLERS !!!!! */
@@ -257,7 +261,7 @@ function endCombat(monster) {
     //remove monster / reset monster
 
     //
-    if (monster.name === "Goblin") {
+    if (monster.type === "Monster") {
         DISPLAYIMG.classList.toggle("flash");
         setTimeout(function () {
             DISPLAYIMG.classList.toggle("flash");
@@ -322,14 +326,15 @@ function menu(e) {
                 TOWNINTERFACE.classList.toggle("hide");
                 break;
             case "rest":
-                if (hero.payGold(5)) {
-                    if (hero.health === hero.maxhealth) {
-                        gameConsoleLog(["p", hero.name, " is already at max health"]);
-                    } else {
-                        hero.heal(999);
-                        hero.displayStats();
-                    }
+
+                if (hero.health === hero.maxhealth) {
+                    gameConsoleLog(["p", hero.name, " is already at max health"]);
+                } else if (hero.payGold(5)) {
+
+                    hero.heal(999);
+                    hero.displayStats();
                 }
+
                 break;
             case "save-game":
                 hero.save();
@@ -482,37 +487,13 @@ function make(desc) {
     return el;
 }
 
-function getData(target) {
-    console.log("target is: " + target);
-    fetch(JSONFILE)
-        .then(response => response.json())
-        .then(function (data) {
-
-            console.log("This is the Json Object in the getData function");
-            console.log(data);
-            console.log("This is JSON's target" + data[target]);
-            //        Catch garbage and place placeholder title
-            if (target == "undefined" || target.includes("<ul>")) {
-                //DO something
-            }
-            data = data[target];
-            console.log("Inside of data target");
-            console.log(data);
-            serverData = JSON.parse(data);
-            console.log(serverData);
-        })
-
-        .catch(error => console.log('Error:', error));
-}
-
 
 /* Initiating commands */
 
 //Pending on Object completion to allow for easy insertion
-getData("monsters"); //Loads the JSON file to a JS Object
-var hero = new Hero("Hadvar", 25, 5, 2, 20); //Placeholder object put Hero into Global scope. Also determines base stats.
-let monster = new Actor("Goblin", 5, 3, 1, 10);
+loadDoc(); //Loads the JSON file to a JS Object
+var hero = new Hero("Hadvar", 25, 5, 2, "Hero", 20); //Placeholder object put Hero into Global scope. Also determines base stats.
+let monster = new Actor("Goblin", 5, 3, 1, "Monster", 10);
 if (loadbtnset === "true") {
     LOADBTN.classList.toggle("disabled");
 }
-
