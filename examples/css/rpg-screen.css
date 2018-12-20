@@ -135,16 +135,27 @@ li {
     list-style: none;
 }
 
-/* Utility Classes */
-.hide {
-    display: none;
-}
+
 
 /* Buttons and Forms */
 button {
     width: 5em;
     height: 2em;
     position: relative;
+}
+
+.videobox {
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
+}
+.videobox > video {
+    margin: auto;
+}
+.videobox > button {
+    margin:  1em auto;
+    width: 10em;
+    height: 5em;
 }
 
 .ingame-button:before {
@@ -255,6 +266,13 @@ footer {
     80% {
         opacity: 1;
     }
+}
+
+/* Utility Classes
+* Utility Classes should be at the end so that nothing overwrites them.
+*/
+.hide {
+    display: none;
 }
 
 @media screen and (max-width: 600px) {

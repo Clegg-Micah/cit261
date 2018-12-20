@@ -26,8 +26,9 @@
                     <li><button id="menu-load-game" class="menu-button disabled">Load Game</button></li>
 <!--
                     <li><button id="menu-option" class="menu-button disabled">Options</button></li>
-                    <li><button id="menu-credits" class="menu-button disabled">Credits</button></li>
 -->
+                    <li><button id="menu-credits" class="menu-button ">Credits</button></li>
+
                 </ul>
             </div>
             <div id="char-creation" class="hide">
@@ -92,14 +93,25 @@
                 </div>
                 <div id="console" class="console">Console</div>
             </div>
+            <div id="video-box" class="videobox hide">
+                <p>THIS IS A PLACEHOLDER VIDEO</p>
+                <p>It will eventually be replaced by a video detailing the credits.</p>
+                <video id="video_1" width="720" height="480" controls>
+                    <source src="assets/video/SampleVideo_720x480_5mb.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <button id="video-back">Back to Main Menu</button>
+            </div>
         </main>
         <footer>
             <p><small>2018 &copy; Micah Clegg, All rights reserved.</small></p>
             <p><a href="" title="View the JavaScript code in GitHub">View the Source Code</a></p>
         </footer>
-        <div id="audio-list">
-            <audio src="assets/audio/hits/hit01.mp3" type="audio/mp3"></audio>
+        <div id="audio-list" class="hide">
+            <audio id="hit_01" src="assets/audio/hits/hit01.mp3" type="audio/mp3" id="hit_01"></audio>
+            <audio id="death_goblin" src="assets/audio/goblin_death.wav" type="audio/wav" ></audio>
         </div>
+
         <script type="text/javascript" src="js/rpg.js"></script>
     </div>
 </body>

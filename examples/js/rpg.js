@@ -16,16 +16,14 @@
 //TODO create an actual order to the code to make this mess make sense.
 
 //TODO Combat cleanup --> reset DONE reset has been accomplished by healing the monster, now the only thing left to do is to modularly set the stats of the monster, should be pretty easy with a setStats function belonging to the Actor Class
-//TODO JSON --> build creatures from JSON
 //TODO Town --> Resting, Buying items built from JSON
 //TODO Options ---> CSS overhaul
-//TODO Credits --> Video of scrolling text
-//TODO Audio --> on attack, on rest, on purchase, on death (Character and otherwise)
+//TODO Credits --> Video of scrolling text --- video implemented need personalized video
+//TODO Audio --> on attack DONE, on rest, on purchase, on death MONSTER DONE
 //TODO Canvas --> Portrait or something
-//TODO Animations --> Attack, TakeDamage(Screenshake), Waiting for all of that to happen, Menu animations,
-//TODO Transitions --> 3 transitions from each view plus perhaps something for the console, make it write it out maybe.
-//transforms
-//TODO add thing to pause combat input
+//TODO Animations --> Attack, TakeDamage(Screenshake) DONE, Waiting for all of that to happen, Menu animations,
+//TODO Modularize input toggle for multiple things.
+//TODO add consequences to dying.
 
 const JSONFILE = "../examples/json/rpg-data.json";
 
@@ -38,6 +36,8 @@ const CREATEBACKBTN = document.getElementById("create-back");
 const GAMESCREEN = document.getElementById("game-display");
 const CONSOLE = document.getElementById("console");
 const LOADBTN = document.getElementById("menu-load-game");
+const VIDEOSCREEN = document.getElementById("video-box");
+const VIDEOBACKBTN = document.getElementById("video-back");
 
 //Character information in Sidebar
 const CHARNAME = document.getElementById("p-name");
@@ -60,11 +60,18 @@ const COMBATTEXT = document.getElementById("combat-text");
 const TOWNINTERFACE = document.getElementById("town-interface");
 const REST = document.getElementById("rest");
 
+//Sound tags
+const HIT_01 = document.getElementById("hit_01");
+const DEATH_GOBLIN = document.getElementById("death_goblin");
+
+//Video tags
+const VIDEO_01 = document.getElementById("video_1")
+
 //Globals to "turn off" Event handlers
 var inputPause = false; //True turns navigation buttons off and turns combat on\
 var inputPauseCombat = true; //Will eventually be used to toggle combat buttons inside of combat after animations are finished
 var loadbtnset = localStorage.getItem("saved");
-var monsterList = [];
+var monsterList = []; //Make the list of monsters global, Might not need to be global
 
 class Actor {
     //The actor is the most used object for this game. It defines Heroes and monsters and is the basis for every other living thing.
@@ -87,6 +94,7 @@ class Actor {
             damage = 0;
         } else if (target.type === "Monster") {
             DISPLAYIMG.classList.toggle("slash");
+            playMedia(HIT_01);
             setTimeout(function () {
                 DISPLAYIMG.classList.toggle("slash");
             }, 1000);
@@ -222,15 +230,27 @@ function createCharFromForm() {
 /* loadJSON -- Modified from w3schools*/
 function loadDoc() {
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
+    xhttp.open("GET", "json/rpg-data.json", true);
+    xhttp.onload = function() {
         if (this.readyState == 4 && this.status == 200) {
             console.log(this.responseText);
+            serverData = JSON.parse(this.responseText)
+            monsterList = serverData["monsters"];
+            console.log(monsterList);
+            var x;
+            var y;
+            var mStats;
+            console.log(monsterList[0]);
+            //name, health, attack, defense, type, gold
+            for(x = 0; x < monsterList.length; x++) {
+                mStats = monsterList[x];
+                monster[x] = new Actor (mStats.name, mStats.maxHP, mStats.attack, mStats.armor, mStats.type, mStats.gold);
+            }
         }
         else{
-            console.log("JSON was unsuccessful!");
+            console.log("JSON was unsuccessful! Returned status of " + xhttp.status);
         }
     };
-    xhttp.open("GET", "json/rpg-data.json", true);
     xhttp.send();
 }
 
@@ -241,11 +261,10 @@ function loadDoc() {
 
 function startCombat() {
     toggleInputPause();
-
     //Choose random monster
+    currentMonster = monster[Math.floor(Math.random() * monsterList.length)];
     //Setup monster from JSON data
-    console.log("monster stats", monster.health);
-    var intro = "Before you stands a " + monster.name + ". It looks angry!";
+    var intro = "Before you stands a " + currentMonster.name + ". It looks angry!";
     COMBATTEXT.innerHTML = intro;
     COMBATTEXT.classList.toggle("hide");
     //Display img's source gets whatever image is related to the monster.
@@ -253,7 +272,7 @@ function startCombat() {
     // display the buttons
     COMBATMENU.classList.toggle("hide");
 
-    //Problem with the faulty logic was the event listeners not being properly turned on and off so instead I went with the approach of relying upon toggleInputPause to 'Turn' them on and off
+    //There was a problem with the faulty logic was the event listeners not being properly turned on and off so instead I went with the approach of relying upon toggleInputPause to 'Turn' them on and off
 }
 
 function endCombat(monster) {
@@ -263,6 +282,7 @@ function endCombat(monster) {
     //
     if (monster.type === "Monster") {
         DISPLAYIMG.classList.toggle("flash");
+        playMedia(DEATH_GOBLIN);
         setTimeout(function () {
             DISPLAYIMG.classList.toggle("flash");
             COMBATMENU.classList.toggle("hide");
@@ -288,6 +308,10 @@ CHARCREATEBTN.addEventListener("click", createCharFromForm);
 CREATEBACKBTN.addEventListener("click", function () {
     showMain("char-create");
 });
+VIDEOBACKBTN.addEventListener("click", function () {
+    showMain("video-box");
+});
+
 COMBATMENU.addEventListener("click", function (e) {
     combatInput(e);
 }, false);
@@ -316,7 +340,9 @@ function menu(e) {
                 //Show options as a modal or something
                 break;
             case "menu-credits":
-                //Show credits
+                MAINMENU.classList.toggle("hide");
+                VIDEOSCREEN.classList.toggle("hide");
+                playMedia(VIDEO_01);
                 break;
             case "new-adventure":
                 TOWNINTERFACE.classList.add("hide");
@@ -334,7 +360,6 @@ function menu(e) {
                     hero.heal(999);
                     hero.displayStats();
                 }
-
                 break;
             case "save-game":
                 hero.save();
@@ -360,21 +385,21 @@ function combatInput(e) {
         console.log("List item ", e.target.id.replace("post-", ""), " was clicked!");
         switch (menuSelection) {
             case "combat-attack":
-                hero.dealDamage(monster);
+                hero.dealDamage(currentMonster);
                 //After 2 monsters they don't regen health. Weird.
-                if (monster.health > 0) {
-                    monster.dealDamage(hero);
+                if (currentMonster.health > 0) {
+                    currentMonster.dealDamage(hero);
                     hero.displayStats();
-                } else if (monster.health <= 0) {
-                    hero.giveGold(monster.gold);
+                } else if (currentMonster.health <= 0) {
+                    hero.giveGold(currentMonster.gold);
                     hero.displayStats();
-                    monster.heal(999);
-                    endCombat(monster);
+                    currentMonster.heal(999);
+                    endCombat(currentMonster);
                 }
                 break;
             case "combat-defend":
                 hero.defense = hero.defense * 2;
-                monster.dealDamage(hero);
+                currentMonster.dealDamage(hero);
                 hero.defense = hero.defense / 2;
                 hero.displayStats();
                 break;
@@ -417,6 +442,12 @@ function toggleInputPause() {
 
 
 /*Utilities */
+function playMedia(media) {
+    media.play();
+}
+function pauseMedia(media) {
+    media.pause();
+}
 function gameConsoleLog(data) {
     var results = make(data);
     CONSOLE.appendChild(results);
@@ -424,6 +455,7 @@ function gameConsoleLog(data) {
 }
 
 function showMain(currentView) {
+    //TODO turn this into something like the other event handlers now that it doe
     if (loadbtnset === "true") {
         LOADBTN.classList.remove("disabled");
     }
@@ -433,22 +465,11 @@ function showMain(currentView) {
     } else if (currentView === "game") {
         GAMESCREEN.classList.toggle("hide");
         MAINMENU.classList.toggle("hide");
+    } else if (currentView === "video-box") {
+        pauseMedia(VIDEO_01);
+        VIDEOSCREEN.classList.toggle("hide");
+        MAINMENU.classList.toggle("hide");
     }
-}
-
-/*This is my lightweight version of the make function below I may switch over once I feel comfortable with make's structure.*/
-function newElement(element, text, parent) {
-    //Pass parent by Element Id creates the element and appends it to another element.
-    var el = document.createElement(element);
-    var t = document.createTextNode(text);
-    el.appendChild(t);
-    document.getElementById(parent).appendChild(el);
-}
-
-function removeElement(elementId) {
-    // Removes an element from the document
-    var element = document.getElementById(elementId);
-    element.parentNode.removeChild(element);
 }
 
 //Other people's code
@@ -496,7 +517,8 @@ function make(desc) {
 //Pending on Object completion to allow for easy insertion
 loadDoc(); //Loads the JSON file to a JS Object
 var hero = new Hero("Hadvar", 25, 5, 2, "Hero", 20); //Placeholder object put Hero into Global scope. Also determines base stats.
-let monster = new Actor("Goblin", 5, 3, 1, "Monster", 10);
+let monster = [];
+let currentMonster;
 if (loadbtnset === "true") {
     LOADBTN.classList.toggle("disabled");
 }
