@@ -213,6 +213,9 @@ footer {
     transform: scale(1.5);
 }
 
+.flash {
+    animation: flash 1s ease-out;
+}
 @keyframes flash {
 
     /*Actually refers to the death animation of a monster */

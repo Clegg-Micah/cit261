@@ -14,6 +14,7 @@
  */
 
 //TODO create an actual order to the code to make this mess make sense.
+//TODO convert this application fully to ES6
 
 //TODO Combat cleanup --> reset DONE reset has been accomplished by healing the monster, now the only thing left to do is to modularly set the stats of the monster, should be pretty easy with a setStats function belonging to the Actor Class
 //TODO Town --> Resting, Buying items built from JSON
